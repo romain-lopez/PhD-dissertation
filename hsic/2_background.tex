@@ -1,0 +1,69 @@
+\section{Background}
+\label{hsicbackground}
+In representation learning, we aim to transform a variable $x$ into a \emph{representation vector} $z$ for which a given downstream task can be performed more efficiently, either computationally or statistically. For example, one may learn a low-dimensional representation that is predictive of a particular label $y$, as in supervised dictionary learning~\cite{dic_learning}. More generally, a hierarchical Bayesian model~\cite{GelmanHill:2007} applied to a dataset yields stochastic representations, namely, the sufficient statistics for the model's posterior distribution. In order to learn representations that respect specific independence statements, we need to bring together two independent lines of research. First, we will present briefly variational auto-encoders and then non-parametric measures of dependence. 
+
+\subsection{Auto-Encoding Variational Bayes (AEVB)}
+We focus on variational auto-encoders~\cite{AEVB} which effectively summarize data for many tasks within a Bayesian inference paradigm~\cite{NIPS2016_6379, Kingma2016}. Let $\{X, S\}$ denote the set of observed random variables and $Z$ the set of hidden random variables (we will use the notation $z^i$ to denote the $i$-th random variable in the set $Z$). Then Bayesian inference aims to maximize the likelihood:
+\begin{align}
+p_\theta(X \mid S) = \int p_\theta(X \mid Z, S) dp(Z).
+\end{align}
+Because the integral is in general intractable, variational inference finds a distribution $q_\phi(Z \mid X, S)$ that minimizes a lower bound on the data---the evidence lower bound (ELBO):
+\begin{align}
+\log p_\theta(X \mid S) \geq \mathbb{E}_{q_\phi(Z \mid X, S)}\log p_\theta(X \mid Z, S) - \kld{(q_\phi(Z|X, S)}{p(Z)}
+\end{align}
+
+In auto-encoding variational Bayes (AEVB), the variational distribution is parametrized by a neural network. In the case of a variational auto-encoder (VAE), both the generative model and the variational approximation have  conditional distributions parametrized with neural networks. The difference between the data likelihood and the ELBO is the variational gap:
+\begin{align}
+	\kld{q_\phi(Z \mid X, S)}{p_\theta(Z \mid X, S)}. 
+\end{align}
+The original AEVB framework is described in the seminal paper \cite{AEVB} for the case $Z = \{z\}, X = \{x\}, S = \emptyset$. The representation $z$ is optimized to ``explain'' the data $x$. 
+
+AEVB has since been successfully applied and extended. One notable example is the semi-supervised learning case---where $Z = \{z^1, z^2\}$, $X = \{x\}$, $y \in X\cup Z$---which is addressed by the M1 + M2 model~\cite{DBLP:journals/corr/KingmaRMW14}. Here, the representation $z_1$ both explains the original data and is predictive of the label $y$. More generally, solving an additional problem is tantamount to adding a node in the underlying graphical model. Finally, the variational distribution can be used to meet different needs: $q_\phi(y \mid x)$ is a classifier and $q_\phi(z^1 \mid x)$ summarizes the data. 
+
+When using AEVB, the empirical data distribution $p_\text{data}(X, S)$ is transformed into the empirical representation:
+\begin{align}
+	\hat{q}_\phi(Z) = \mathbb{E}_{p_\text{data}(X, S)}q_\phi(Z \mid X, S).
+\end{align}
+This mixture is commonly called the aggregated posterior~\cite{Makhzani2015} or average encoding distribution~\cite{Hoffman2016}.
+
+
+\subsection{Non-parametric estimates of dependence with kernels}
+
+Let $(\Omega, \mathcal{F}, \mathbb{P})$ be a probability space. Let $\mathcal{X}$ (resp. $\mathcal{Y}$) be a separable metric space. Let $u: \Omega \rightarrow \mathcal{X}$ (resp. $v: \Omega \rightarrow \mathcal{Y}$) be a random variable. Let $k: \mathcal{X} \times \mathcal{X} \rightarrow \mathbb{R}$ (resp. $l: \mathcal{Y} \times \mathcal{Y} \rightarrow \mathbb{R}$) be a continuous, bounded, positive semi-definite kernel. Let $\mathcal{H}$ (resp. $\mathcal{K}$) be the corresponding reproducing kernel Hilbert space (RKHS) and $\phi: \Omega \rightarrow \mathcal{H}$ (resp. $\psi:\Omega \rightarrow \mathcal{K}$) the corresponding feature mapping.
+
+Given this setting, one can embed the distribution $P$ of random variable $u$ into a single point $\mu_P$ of the RKHS $\mathcal{H}$ as follows:
+\begin{equation}
+\mu_{P} = \int_{\Omega} \phi(u) P(du).
+\label{hsicembedding}
+\end{equation}
+If the kernel $k$ is universal\footnote{A kernel $k$ is universal if $k(x,\cdot )$ is continuous for all $x$ and the RKHS induced by $k$ is dense in $C(\mathcal{X})$. This is true for the Gaussian kernel $(u, u') \mapsto e^{-\gamma || u - u'|| ^2}$ when $\gamma > 0$.}, then the mean embedding operator $P \mapsto \mu_P$ is injective~\cite{NIPS2007_3340}. 
+
+We now introduce a kernel-based estimate of \emph{distance} between two distributions $P$ and $Q$ over the random variable $u$. This approach will be used by one of our baselines for learning invariant representations. Such a distance, defined via the canonical distance between their $\mathcal{H}$-embeddings, is called the maximum mean discrepancy~\cite{MMD} and denoted $\text{MMD}(P, Q)$. 
+
+The joint distribution $P(u, v)$ defined over the product space $\mathcal{X} \times \mathcal{Y}$ can be embedded as a point $\mathcal{C}_{uv}$ in the tensor space $\mathcal{H} \otimes \mathcal{K}$. It can also be interpreted as a linear map $\mathcal{H} \rightarrow \mathcal{K}$:
+\begin{align}
+\forall (f, g) \in \mathcal{H} \times \mathcal{K},~ \mathbb{E}f(u)g(v) = \langle f(u) ,\mathcal{C}_{uv}g(v) \rangle_\mathcal{H} = \langle f\otimes g, \mathcal{C}_{uv}\rangle_{\mathcal{H} \otimes \mathcal{K}}.
+\end{align}
+
+Suppose the kernels $k$ and $l$ are universal. The largest eigenvalue of the linear operator $\mathcal{C}_{uv}$ is zero if and only if the random variables $u$ and $v$ are marginally independent~\cite{Gretton2005}. A measure of dependence can therefore be derived from the Hilbert-Schmidt norm of the cross-covariance operator $\mathcal{C}_{uv}$ called the Hilbert-Schmidt Independence Criterion (HSIC)~\cite{HSIC}. Let $(u_i, v_i)_{1 \leq i \leq n}$ denote a sequence of iid copies of the random variable $(u, v)$. In the case where $\mathcal{X} = \mathbb{R}^p$ and $\mathcal{Y} = \mathbb{R}^q$, the V-statistics in Equation~\ref{hsichsic_amp} yield a biased empirical estimate~\cite{NIPS2007_3340}, which can be computed in $\mathcal{O}(n^2(p+q))$ time.
+An estimator for HSIC is
+\begin{align}\label{hsichsic_amp}
+\begin{split}
+\hat{\text{HSIC}}_n(P) &= \frac{1}{n^2}\sum_{i, j}^n k(u_i, u_j)l(v_i, v_j) \\
+&+ \frac{1}{n^4}\sum_{i, j, k, l}^n k(u_i, u_j)l(v_k, v_l) \\
+&- \frac{2}{n^3}\sum_{i, j, k}^n k(u_i, u_j)l(v_i, v_k).
+\end{split}
+\end{align}
+
+The definition of the cross-covariance operator can be extended to the case of $d$ random variables, simply by adhering to the formal language of tensor spaces. Let $X = (X^1, ..., X^d)$ be a random vector with each component of dimension $p$. The components $X^1, ..., X^d$ are mutually independent if the joint distribution is equal to the tensor product of the marginal distribution. \cite{Pfister2016} derives functional formulation, population statistics and V-statistics for the Hilbert-Schmidt norm of the corresponding generalized cross-covariance operator called $d$HSIC. Notably, under the hypothesis that the canonical kernel from the tensor product $\bigotimes_k\mathcal{H}_k$ is universal, the $d$HSIC is null if and only if the components of the random vector are mutually independent. We write here the retained V-statistics that we will use for the experiments and can compute in time $\mathcal{O}(dn^2p)$:
+
+\begin{equation} \label{hsicdhsic_samp}
+\begin{split}
+\hat{\text{dHSIC}}_n(P) &= \frac{1}{n^2}\sum_{M_2(n)}\prod_{j=1}^d k^j(x_{i_1}^j, x_{i_2}^j) \\
+&+ \frac{1}{n^{2d}}\sum_{M_{2d}(n)}\prod_{j=1}^d k^j(x_{i_{2j-1}}^j, x_{i_{2j}}^j) \\
+&- \frac{2}{n^{d+1}}\sum_{M_{d+1}(n)}\prod_{j=1}^d k^j(x_{i_{1}}^j, x_{i_{j+1}}^j)
+\end{split}
+\end{equation}
+
+The question that naturally follows is when is the canonical kernel from the tensor product $\bigotimes_k\mathcal{H}_k$ universal. \cite{Szabo2017} showed that the characteristic property of the individual kernels is not enough in general. However, in the case of  continuous,
+bounded and translation invariant kernels this is a sufficient condition. In subsequent work, we plan to consider the $d$HSIC in this setting.

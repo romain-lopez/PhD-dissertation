@@ -1,0 +1,20 @@
+\begin{table}
+    \centering
+    \begin{small}
+\begin{tabular}{lccccc}
+\toprule
+ & \textbf{VAE} & \textbf{IWAE}& \textbf{WW} & \textbf{$\rchi$-VAE} \\ 
+ \midrule
+IWELBO  & -104.74 & \textbf{-101.92} & -102.82 & -105.29\\
+% \midrule
+PSIS & $\gtrsim$ 1 & $\gtrsim$ 1 & $\gtrsim$ 1 & $\gtrsim$ 1\\
+% \midrule
+AUPRC & 0.35 & \textbf{0.45} & 0.29 & 0.44 \\
+\bottomrule
+\end{tabular}
+\end{small}
+\caption
+[Results for the M1+M2 model on MNIST]{\label{table:m1m2}
+Results for the M1+M2 model on MNIST. AUPRC refers to the area under of the PR curve for rejecting the label 9. 
+}
+\end{table}

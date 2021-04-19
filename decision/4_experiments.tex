@@ -1,0 +1,13 @@
+% % \section{Experiments}
+% % \label{sec:exp}
+% \romain{Put this around}
+% % We explore three experimental settings.
+% % First, we consider synthetic data drawn from probabilistic principal component analysis (pPCA), as this setting most directly illustrates the consequences of Theorem~\ref{thm:linear_VAE}.
+% % Second, we consider MNIST digit classification~\cite{mnist} with a ``reject'' option.
+% % Third, we detect differentially expressed genes in single-cell RNA sequencing data (scRNA-seq). 
+
+% In all those experiments, we use a two-time step to decision-making where we first learn a model with a VAE framework and then perform (a potentially different flavor of) variational inference procedure, treating the model as fixed. We aim at investigating whether a certain combination is consistently better. 
+
+% To evaluate the learned generative model, we provide goodness of fit metrics based on IWELBO on held-out data, which are proxies for the log-likelihood. When available, we also report the exact log-likelihood (pPCA) or an estimate from AIS (scRNA-seq). Also, we report the Pareto-smoothed importance sampling (PSIS) diagnostic \smash{$\hat{k}$} for diagnosis of variational inference~\cite{pmlr-v80-yao18a}. PSIS is computed by fitting a generalized Pareto distribution to the IS weights; it indicates the viability of the variational distribution for IS. We report the median PSIS over $64$ observations, using $10,000$ samples from the posterior. All results are averaged across five random initialization of the neural networks weights.
+
+% When not stated otherwise, we use Adam~\cite{adam} for optimization of $\theta$ and $\phi$. We use $25$ particles (also for the VAE, as in~\cite{rainforth2018tighter}) per iteration for training the models, $10,000$ samples for reporting log-likelihood proxies and $200$ particles for making decisions (SNIS for all methods except for the VAE where the plugin estimator has better performance and is reported). We ran our experiments on a machine with a single NVIDIA GeForce RTX 2070 GPU.

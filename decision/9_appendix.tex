@@ -1,0 +1,199 @@
+\setcounter{section}{0}
+\renewcommand{\thesection}{\thechapter.\Alph{section}}
+
+\section{Analytical derivations in the bivariate Gaussian setting}
+\label{app:biv_gauss}
+For a fixed $x$, we adopt the condensed notation $p_\theta(z \mid x) = p$. According to the Gaussian conditioning formula, there exists $\mu$ and $\Lambda$ such that 
+\begin{align}
+    p \sim \mathrm{Normal}\left(\mu, \Lambda^{-1}\right).
+\end{align}
+We consider variational approximations of the form
+\begin{align}
+    q \sim \mathrm{Normal}\left(\nu, \textrm{diag}(\lambda)^{-1}\right).
+\end{align}
+We wish to characterize the solution $q$ to the following optimization problems
+\begin{align}
+    q_{\textrm{RKL}} &= \argmin_{q}\kl{q}{p}, \\
+    q_{\textrm{FKL}} &= \argmin_{q}\kl{p}{q}, \\
+    q_\chi &= \argmin_{q}\chidiv{p}{q}.
+\end{align}
+
+We focus on the setting where the mean of the variational distribution is correct. This is true for variational Bayes or the general Renyi divergence, as underlined in ~\cite{NIPS2016_6208}. We therefore further assume $\nu$ can be chosen equal to $\mu$ for simplicity. 
+
+In the bivariate setting, we have conveniently an analytically tractable inverse formula:
+\begin{align}
+\begin{array}{cc}
+    \Lambda = \begin{bmatrix}
+    \Lambda_{11}       & \Lambda_{12} \\
+    \Lambda_{21}       & \Lambda_{22} 
+\end{bmatrix},&
+    \Lambda^{-1} = \frac{1}{|\Lambda|} \begin{bmatrix}
+    \Lambda_{22}       & -\Lambda_{12} \\
+    -\Lambda_{21}       & \Lambda_{11} 
+\end{bmatrix},
+\end{array}
+\end{align}
+
+We also rely on the expression of the Kullback-Leibler divergence between two multivariate Gaussian distributions of $\mathbb{R}^d$
+\begin{align}
+    \kl{\textrm{Normal}\left(\mu, \Sigma_1\right)}{ \textrm{Normal}\left(\mu, \Sigma_2\right)} = \frac{1}{2}\left[\log\frac{|\Sigma_2|}{|\Sigma_1|} - d + \textrm{Tr}(\Sigma_2^{-1}\Sigma_1)\right].
+\end{align}
+
+\paragraph{Reverse KL}
+Using the expression of the KL and the matrix inverse formula, we have that
+\begin{align}
+    \argmin_q \kl{q}{p} = \argmin_{\lambda_1, \lambda_2} \log \lambda_1\lambda_2 + \frac{\Lambda_{11}}{\lambda_1} + \frac{\Lambda_{22}}{\lambda_2}.
+\end{align}
+The solution to this optimization problem is 
+\begin{align}
+\left\{
+\begin{array}{ll}
+\lambda_1 &= \Lambda_{11} \\
+\lambda_2 &= \Lambda_{22} 
+\end{array} \right..
+\end{align}
+
+\paragraph{Forward KL}
+From similar calculations,
+\begin{align}
+    \argmin_q \kl{p}{q} = \argmin_{\lambda_1, \lambda_2} -\log \lambda_1\lambda_2 + \frac{1}{|\Lambda|}\left[\lambda_1\Lambda_{22} + \lambda_2\Lambda_{11}\right].
+\end{align}
+The solution to this optimization problem is 
+\begin{align}
+\left\{
+\begin{array}{ll}
+\lambda_1 &= \Lambda_{11} - \frac{\Lambda_{12}\Lambda_{21}}{\Lambda_{22}} \\
+\lambda_2 &= \Lambda_{22} - \frac{\Lambda_{12}\Lambda_{21}}{\Lambda_{11}} 
+\end{array} \right..
+\end{align}
+
+
+\paragraph{Chi-square divergence}
+A closed-form expression of the Renyi divergence for exponential families (and in particular multivariate Gaussian) is derived in~\cite{burbea1984convexity}. We could in principle follow the same approach. However, \cite{NIPS2016_6528} derived a similar results, which is exactly the wanted quantity for $\alpha = -1$ in Appendix~B of their manuscript. Therefore, we simply report this result 
+\begin{align}
+\left\{
+\begin{array}{ll}
+\lambda_1 &= \Lambda_{11}\left[ \frac{3}{2} - \frac{1}{2}\sqrt{1 + \frac{8\Lambda_{12}\Lambda_{21}}{\Lambda_{11}\Lambda_{22}}}\right] \\
+\lambda_2 &= \Lambda_{22}\left[ \frac{3}{2} - \frac{1}{2}\sqrt{1 + \frac{8\Lambda_{12}\Lambda_{21}}{\Lambda_{11}\Lambda_{22}}}\right]  
+\end{array} \right.
+\end{align}
+
+\paragraph{Importance weighted variational inference} For IWVI, most quantities are not available in closed-form. However, the problem is simple and low-dimensional. We use naive Monte Carlo with $10,000$ samples to estimate the IWELBO. The parameters $\lambda_1, \lambda_2$ are the solution of numerical optimization of the IWELBO (Nelder–Mead method). 
+
+
+\section{Posterior expectation estimator for the M1+M2 model}
+\label{app:m1m2esti}
+
+We derive here the two estimators for estimating $p_\theta(c \mid x)$ in the M1+M2 model. First, we remind the reader that the generative model is
+\begin{align}
+\label{eq:m1m2_gen_app}
+    p_\theta(x, z, c, u) &= p_\theta(x \mid z)p_\theta(z \mid c, u)p_\theta(c)p_\theta(u),
+\end{align}
+and that the variational distribution factorizes as
+\begin{align}
+q_\phi(z, c, u \mid x) &= q_\phi(z \mid x)q_\phi(c \mid z)q_\phi(u \mid z, c).
+\end{align}
+
+\subsubsection{Plugin approach}
+For the plugin approach, we compute $q_\phi(c \mid x)$ as:
+\begin{align}
+    q_\phi(c \mid x) &= \iint_{z, u} q_\phi(c, u, z \mid x)dudz \\ 
+    &= \iint_{z, u} q_\phi(u \mid c, z)q_\phi(c, z \mid x)dudz \\
+    &= \iint_{z} q_\phi(c \mid z) q_\phi(z \mid x)dz,
+\end{align}
+where the last integral is estimated with naive Monte Carlo. 
+
+\subsubsection{SNIS approach}
+% For this estimator, we first use Bayes rule on the two first terms of Eq.~\eqref{eq:m1m2_gen_app} so as to rewrite the posterior as:
+% \begin{align}
+%     p_\theta(z, c, u \mid x)
+%     &=
+%     \frac{p_\theta(x, z, c, u)}{p_\theta(x)} \\
+%     &= \frac{p_\theta(c)
+%     p_\theta(u)}{p_\theta(x)}
+%     \frac
+%     {p_\theta(c, u \mid z) p_\theta(z)}
+%     {p_\theta(c, u)}
+%     \frac
+%     {p_\theta(z \mid x) p_\theta(x)}
+%     {p_\theta(z)} \\
+%     &=
+%     p_\theta(c, u \mid z)
+%     p_\theta(z \mid x).
+%     % \label{generative_model_bis_eq}
+% \end{align}
+We obtain $p_\theta(c, x)$ via marginalization of the latent variables $z, u$:
+\begin{align}
+    p_\theta(c, x)
+    &= 
+    \iint
+    p_\theta(x, u, c, z) dzdu.
+\end{align}
+We may estimate this probability, for a fixed $c$, using $q_\phi(z, u \mid x, c)$ as a proposal for importance sampling:
+\begin{align}
+p_\theta(c, x)
+    &=
+    \mathbb{E}
+    _{q_\phi(z, u \mid x, c)}
+    \left[
+        \frac{p_\theta(x, u, c, z)}{q_\phi(z, u \mid x, c)}
+    \right].
+\end{align}
+Then, the estimates for $p_\theta(c, x)$ may be normalized by their sum for all labels (equals to $p_\theta(x)$) to recover $p_\theta(c \mid x)$. 
+
+Interestingly, this estimator does not make use of the classifier $q_\phi(c \mid z)$, so we expect it to have a possibly lower performance than the plugin. Indeed, the $q_\phi(c \mid z)$ is fit with a classification loss towards the labelled datapoints. 
+
+\section{Analysis of alternate divergences for the M1+M2 model}
+\label{app:m1m2}
+We have the following pathological behavior, similar to the one presented in the factor analysis instance. This ill-behavior is further exacerbated when the M1+M2 model is fitted with a composite loss as in Equation~9 of~\cite{KingmaRMW14}. Indeed, neural networks are known to have poorly calibrated uncertainties~\cite{pmlr-v70-guo17a}.
+\begin{prop}
+\label{prop:M1M2}
+Consider the model defined in Eq.~\eqref{eq:m1m2_gen}. Assume that posterior inference is exact for latent variables $u$ and $z$, such that $q_\phi(z \mid x)q_\phi(u \mid c, z) = p_\theta(z, u \mid c, x)$. Further, assume that for a fixed $z \in \mathcal{Z}$, $p_\theta(c \mid z)$ has complete support. Then, as $\mathbb{E}_{q_\phi(c \mid z)}\log q_\phi(c \mid z) \rightarrow 0$, it follows that
+\begin{enumerate}
+    \item $\kl{q_\phi(c, z, u \mid x)}{p_\theta(c, z, u \mid x)}$ is bounded;
+    \item $\kl{p_\theta(c, z, u \mid x)}{q_\phi(c, z, u \mid x)}$ diverges; and
+    \item $\chidiv{p_\theta(c, z, u \mid x)}{q_\phi(c, z, u \mid x)}$ diverges.
+\end{enumerate}
+\end{prop}
+\begin{proof}
+The proof mainly consists in decomposing the divergences. The posterior for unlabelled samples factorizes as
+\begin{align}
+    p_\theta(c, u, z \mid x) = p_\theta(c \mid z) p_\theta(z, u \mid x, c).
+\end{align}
+From this, expression of the other divergences follow under the semi-exact inference hypothesis. Remarkably, all three divergences can be decomposed in similar forms. Also, the expression of the divergences can be written in closed form (recall that $c$ is discrete) and as a function of $\lambda$.
+
+\textit{Reverse-KL.} In this case, the Kullback-Leibler divergence can be written as
+\begin{align}
+    \kl{q_\phi(c, z, u \mid x)}{p_\theta(c, z, u \mid x)} &= \mathbb{E}_{q_\phi(c \mid z)} \kl{q_\phi(z, u \mid x, c)}{p_\theta(z, u\mid x, c)} \\
+    &+\mathbb{E}_{q_\phi(z \mid x)} \kl{q_\phi(c \mid z)}{p_\theta(c \mid z)},
+\end{align}
+which further simplifies to 
+\begin{align}
+    \kl{q_\phi(c, z, u \mid x)}{p_\theta(c, z, u \mid x)} &= \mathbb{E}_{p_\theta(z \mid x)} \kl{q_\phi(c \mid z)}{p_\theta(c \mid z)}.
+\end{align}
+This last equation can be rewritten as a constant plus the differential entropy of $q_\phi(c \mid z)$, which is bounded by $\log C$ in absolute value.
+
+\textit{Forward-KL.} Similarly, we have that
+\begin{align}
+    \kl{p_\theta(c, z, u \mid x)}{q_\phi(c, z, u \mid x)} &= \mathbb{E}_{p_\theta(c \mid z)} \kl{p_\theta(z, u\mid x, c)}{q_\phi(z, u \mid x, c)} \\
+    &+\mathbb{E}_{p_\theta(z \mid x)} \kl{p_\theta(c \mid z)}{q_\phi(c \mid z)},
+\end{align}
+which also further simplifies to
+\begin{align}
+    \kl{p_\theta(c, z, u \mid x)}{q_\phi(c, z, u \mid x)} &= \mathbb{E}_{p_\theta(z \mid x)} \kl{p_\theta(c \mid z)}{q_\phi(c \mid z)} \\
+    &= \mathbb{E}_{p_\theta(z \mid x)} \sum_{c=1}^C p_\theta(c \mid z) \log \frac{p_\theta(c \mid z)}{q_\phi(c \mid z)}.
+\end{align}
+This last equation includes terms in $p_\theta(c \mid z)\log q_\phi(c \mid z)$, which are unbounded whenever $q_\phi(c \mid z)$ is zero but $p_\theta(c \mid z)$ is not.
+
+\textit{Chi-square.} Finally, for this divergence, we have the decomposition
+\begin{align}
+    \chidiv{p_\theta(c, z, u \mid x)}{q_\phi(c, z, u \mid x)} &= \mathbb{E}_{q_\phi(z, c, u \mid x)} \frac{p^2_\theta(z, u\mid x, c)p^2_\theta(c \mid z)}{q^2_\phi(z, u \mid x, c)q^2_\phi(c \mid z)},
+\end{align}
+which in that case simplifies to
+\begin{align}
+    \chidiv{p_\theta(c, z, u \mid x)}{q_\phi(c, z, u \mid x)} = \mathbb{E}_{p_\theta(z \mid x)} \chidiv{p_\theta(c \mid z)}{q_\phi(c \mid z)}.
+\end{align}
+Similarly, the last equation includes terms in $\nicefrac{p^2_\theta(c \mid z)}{q_\phi(c \mid z)}$, which are unbounded whenever $q_\phi(c \mid z)$ is zero but $p_\theta(c \mid z)$ is not.
+\end{proof}
+
+\renewcommand{\thesection}{\thechapter.\arabic{section}}

@@ -1,0 +1,18 @@
+\begin{center}
+\begin{small}
+\begin{tabular}{lccccccc}
+\toprule
+ & \textbf{VAE}  & \textbf{IWAE} & \textbf{WW} & \textbf{$\chi$-VAE} \\ \midrule
+ AIS & -379.93 & \textbf{-375.53} & -376.34 & -376.66 \\
+IWELBO  & -381.50 & \textbf{-376.21} & -377.01 & -378.32\\
+\midrule
+PSIS  & \textbf{0.67} & 0.73 & 0.86 & 0.76\\
+\midrule
+MAE FDR & 8.49 & \textbf{0.97} & 1.10 & 1.52 \\
+\bottomrule
+\end{tabular}
+\end{small}
+\end{center}
+\caption
+[Results for the scVI model]{\label{table_fdr}
+Results for the scVI model. MAE FDR refers to the mean absolute error for FDR estimation.}

@@ -1,0 +1,144 @@
+%% thesis.tex 2014/04/11
+%
+% Based on sample files of unknown authorship.
+%
+% The Current Maintainer of this work is Paul Vojta.
+
+\documentclass{ucbthesis}
+
+\input{packages}
+
+
+% To compile this file, run "latex thesis", then "biber thesis"
+% (or "bibtex thesis", if the output from latex asks for that instead),
+% and then "latex thesis" (without the quotes in each case).
+
+% Double spacing, if you want it.  Do not use for the final copy.
+% \def\dsp{\def\baselinestretch{2.0}\large\normalsize}
+% \dsp
+
+% If the Grad. Division insists that the first paragraph of a section
+% be indented (like the others), then include this line:
+% \usepackage{indentfirst}
+
+\addtolength{\abovecaptionskip}{\baselineskip}
+\input{math_preamble}
+
+\bibliography{references}
+
+\listfiles
+\begin{document}
+
+% Declarations for Front Matter
+
+\title{\textbf{Charting Cellular States, One Cell at a Time:\\ Computational, Inferential and Modeling Perspectives}}
+\author{Romain Lopez}
+\degreesemester{Spring}
+\degreeyear{2021}
+\degree{Doctor of Philosophy}
+\othermembers{Professor Sandrine Dudoit}
+\cochairs{Professor Michael I. Jordan}{Associate Professor Nir Yosef}
+\numberofmembers{3}
+\field{Engineering --- Electrical Engineering and Computer Sciences}
+
+% This affects the title and approval pages, which by default calls this
+% document a "dissertation", not a "thesis".
+
+\maketitle
+% Delete (or comment out) the \approvalpage line for the final version.
+% \approvalpage
+\copyrightpage
+
+\include{abstract}
+
+\begin{frontmatter}
+
+\begin{dedication}
+\null\vfil
+\begin{center}
+\begin{itshape}
+To my parents, Marie \& Fran\c{c}ois, \\
+To my brother, Mathieu.
+\end{itshape}
+\end{center}
+\vfil\null
+\end{dedication}
+
+% You can delete the \clearpage lines if you don't want these to start on
+% separate pages.
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{2}
+\tableofcontents
+\clearpage
+\listoffigures
+\clearpage
+\listoftables
+
+\input{acknowledgement}
+\end{frontmatter}
+
+\pagestyle{headings}
+
+\include{introduction/introduction}
+
+\chapter{Background on Deep Generative Models}
+\label{background}
+\input{review/1_introduction}
+\input{review/2_review}
+
+\part{Bayesian Models for Single-cell Transcriptomics}
+\label{part1}
+
+\chapter{Large-scale Analysis of Single-cell Transcriptomics}
+\chaptermark{Single-cell Variational Inference}
+\label{scvi}
+\input{scvi/1_introduction.tex}
+\input{scvi/2_results.tex}
+\input{scvi/3_discussion.tex}
+\input{scvi/5_supplementary_material.tex}
+
+\chapter{Harmonization and Annotation of Multiple Single-cell Experiments}
+\chaptermark{Single-cell Annotation using Variational Inference}
+\label{scanvi}
+\input{scanvi/1_introduction.tex}
+\input{scanvi/2_results.tex}
+\input{scanvi/3_discussion.tex}
+\input{scanvi/6_supplementary_material.tex}
+
+\part{Machine Learning for Science}
+\label{part2}
+\chapter{Information Constraints on Auto-Encoding Variational Bayes}
+\chaptermark{HSIC-Constrained VAES}
+\label{hcv}
+% \input{hsic/0_opening}
+\input{hsic/1_introduction}
+\input{hsic/2_background}
+\input{hsic/3_HCV}
+\input{hsic/4_independence}
+\input{hsic/5_invariant}
+\input{hsic/6_structured}
+\input{hsic/7_discussion}
+
+\chapter{Decision-making with Auto-Encoding Variational Bayes}
+\chaptermark{Decision-making with AEVB}
+\label{decision}
+% \input{decision/0_opening.tex}
+\input{decision/1_introduction}
+\input{decision/2_relatedwork}
+\input{decision/3_theory_and_algs}
+\input{decision/5_posterior_query_diagnosis}
+\input{decision/4_experiments}
+\input{decision/6_label_decision}
+\input{decision/7_FDR}
+\input{decision/8_discussion}
+\input{decision/9_appendix}
+
+\part{~~Conclusion}
+\chapter{Discussion}
+\label{perspectives}
+\input{review/3_applications}
+\section{Perspectives}
+\input{review/4_perspectives}
+
+\printbibliography
+\end{document}

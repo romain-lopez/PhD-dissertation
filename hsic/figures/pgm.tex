@@ -1,0 +1,64 @@
+\begin{figure}[t!]
+\captionsetup[subfigure]{justification=centering}
+
+    \centering
+    
+    
+      \tikzstyle{latent} = [circle,fill=white,draw=black,inner sep=1pt,
+minimum size=30pt, font=\fontsize{15}{15}\selectfont, node distance=1]
+\tikzstyle{plate caption} = [caption, node distance=0, inner sep=0pt, font=\fontsize{15}{15}\selectfont,
+below left=5pt and 0pt of #1.south east] 
+
+
+  \newcommand{\ltkiz}{1cm}
+    
+    
+    
+    \begin{subfigure}[t]{0.3\textwidth}
+        \centering   
+\tikz{ %
+  \node[obs] (x) {${x}$} ; %
+  \node[latent, above=0.5 * \ltkiz of x, xshift=+\ltkiz] (u) {${u}$};
+    \node[latent, above=0.5 * \ltkiz of x,xshift=-\ltkiz] (v) {${v}$};
+    
+    \edge {u} {x};
+    \edge {v} {x};
+  }        
+        \caption{Learning Interpretable Representations}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[t]{0.3\textwidth}
+        \centering  
+%\scalebox{0.8}        {
+        \tikz{ %
+  \node[obs] (x) {${x}$} ; %
+  \node[obs, above=0.5 * \ltkiz of x, xshift=+\ltkiz] (s) {${s}$};
+    \node[latent, above=0.5 * \ltkiz of x,xshift=-\ltkiz] (z) {${z}$};
+    
+    \edge {z} {x};
+    \edge {s} {x};
+  }
+         
+ \caption{Learning Invariant Representations}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[t]{0.30\textwidth}
+        \centering  
+\tikz{ %
+  \node[obs] (x) {${x}$} ; %
+  \node[latent, above=0.5 * \ltkiz of x, xshift=2 *\ltkiz] (u) {${u}$};
+  \node[obs, below=0.5 * \ltkiz of u, xshift=0] (s) {${s}$};
+    \node[latent, above=0.5 * \ltkiz of x,xshift=0] (z) {${z}$};
+    
+    \edge {z} {x};
+    \edge {u} {s};
+    \edge {u} {x};
+  }   
+  
+ \caption{
+  Learning Denoised Representations}
+    \end{subfigure}
+    \caption{Tasks presented in the chapter.}
+    \label{hsicpgm}
+\end{figure}
+

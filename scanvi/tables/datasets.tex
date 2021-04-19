@@ -1,0 +1,46 @@
+\begin{table}
+\begin{small}
+\begin{tabularx}{\textwidth}{lllXl}
+\toprule
+\textbf{Dataset Name} & \textbf{Tech.} &\textbf{$n$ cells} &  \textbf{Description} & \textbf{Ref.} \\
+\midrule
+
+% \textbf{SIM1} & Simulation & 20,000 & simulated by first generating a single dataset with noise in the UMI mode of SymSim, randomly splitting it into two batches and multiplying each batch by a different small gene specific scaling factor.  & \cite{symsim}\\[0.2cm]
+
+% \textbf{SIM2} & Simulation & 20,000 & simulated by first simulating the true gene count without noise, splitting randomly into to batches and simulating one batch with UMI noise model and nonUMI noise model in SymSim & \cite{symsim}\\[0.2cm]
+
+% \textbf{SIM3} & Simulation & 20,000 & simulated by simulating two batches of cells that share all other parameters except for a batch-specific Extrinsic Variation Factor (EVF) & \cite{symsim}\\[0.2cm]
+
+\textbf{PBMC-8K} & 10x & 8,381 & peripheral blood mononuclear cells (PBMCs) from a healthy donors; labels extracted from \cite{SCONE} & \cite{10x}\\[0.2cm]
+
+\textbf{PBMC-CITE} &10x & 7,667 & PBMCs  obtained from CITE-seq; labels generated manually by inspection of protein marker level on Seurat clusters &\cite{stoeckius2017simultaneous}\\[0.2cm]
+
+\textbf{PBMC-68K} & 10x & 68,579 & fresh PBMCs collected from healthy donor &\cite{zheng2017massively} \\[0.2cm]
+
+\textbf{PBMC-Sorted} &10x &  94,655 & Bead-purified PBMCs collected from the same donor as PBMC68K  & \cite{zheng2017massively}\\[1cm]
+
+\textbf{MarrowTM-10x} &10x &4,112 & Mouse bone marrow cells collected from two female mice & \cite{quake2018single}\\[0.2cm]
+
+\textbf{MarrowTM-ss2} &  Sma.-Seq2 & 5,351 & FACS sorted cells (B cells, T cells, granulocytes and  Kit (+), Sca-1 (+) and Lin (-) hematopoietic stem cells) from 3 male and 2 female mice, & \cite{quake2018single}\\[1cm]
+
+\textbf{Pancreas-InDrop} & inDrop  & 8,569 & Human Pancreas & \cite{pancreasindrop}\\[0.2cm]
+
+\textbf{Pancreas-CELSeq2} & CEL-Seq2 & 2,449 & Human Pancreas & \cite{pancreascelseq}\\[0.2cm]
+
+\textbf{DentateGyrus-10x} & 10x &5,454 & Mouse Dentate Gyrus & \cite{dentategyrus2018}\\[0.2cm]
+
+\textbf{DentateGyrus-C1} & Fluid. C1 & 2,303 & Mouse Dentate Gyrus & \cite{dentategyrus2018}\\[1cm]
+
+\textbf{CORTEX} & 10x & 160,796  & Mouse Nervous System & \cite{zeisel2018}\\[1cm]
+
+\textbf{HEMATO-Tusi} & inDrop & 4,016 & Hematopoeitic Progenitor Mouse Cells & \cite{Tusi2018}\\[0.2cm]
+
+\textbf{HEMATO-Paul} & MARS-seq & 2,730 & Hematopoeitic Progenitor Mouse Cells & \cite{PAUL2015}\\[1cm]
+
+\textbf{SCANORAMA} & Mixture & 105,476 & human cells from 26 diverse scRNA-seq experiments across 9 different technologies & \cite{scanorama}\\
+\bottomrule
+\end{tabularx}
+\caption[List of datasets used in this chapter]{List of datasets used in this chapter. Note that for the PBMC-Sorted 11 cell types were collected according to the paper but only 10 are available from the 10x website~\cite{10x}.\label{scanvidatasets}}
+\end{small}
+
+\end{table}

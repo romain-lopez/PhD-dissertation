@@ -1,0 +1,50 @@
+\usepackage[isbn=false, doi=false,date=year, sorting=none, maxbibnames=9, minbibnames=9]{biblatex}
+\usepackage{rotating} % provides sidewaystable and sidewaysfigure
+
+\usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref}
+\hypersetup{colorlinks,%
+citecolor=blue,%
+filecolor=ForestGreen,%
+linkcolor=black,%
+urlcolor=magenta
+}
+
+\usepackage[T1]{fontenc}
+\usepackage{amsfonts,amsmath,amsthm,amssymb}
+\usepackage{graphicx}
+\graphicspath{{scvi/}{scanvi/}{hsic/}{decision/}}
+\usepackage{color}
+\usepackage{tikz}
+\usepackage{adjustbox}
+\usepackage{float} 
+\usepackage{lscape}
+\usepackage{csquotes}
+\usepackage{url}
+\usepackage{algorithmic}
+\usepackage{subcaption}
+\usepackage{mathtools}
+\usepackage{afterpage}
+\usepackage{nicefrac}
+\usepackage{dsfont}
+\usepackage{MnSymbol}
+\usepackage{booktabs,tabularx, multirow}
+\usepackage{thmtools}
+
+\usepackage{newfloat}
+\DeclareFloatingEnvironment[
+    fileext=lof,
+    name=Figure,
+    placement=tbhp,
+    within=chapter,
+]{suppfigure}
+
+\renewcommand{\thesuppfigure}{\thechapter.\Alph{suppfigure}}
+
+
+\AtEveryBibitem{%
+  \clearfield{volume}%
+  \clearfield{number}
+  \clearfield{pages}}
+
+%   \DeclareFieldFormat{titlecase}{\MakeSentenceCase*{#1}}

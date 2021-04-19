@@ -1,0 +1,24 @@
+\begin{figure}
+\begin{tikzpicture}[thick]
+  \node[obs] (x) {${x}_{ng}$} ; %
+  \node[latent, above=0.5 * \ltkiz of x, xshift=\ltkiz] (h) {${h}_{ng}$};
+  \node[latent, above=0.5 * \ltkiz of x, xshift=-\ltkiz]  (y) {${y}_{ng}$};
+  \node[latent, above=0.5 * \ltkiz of y, xshift=-2*\ltkiz] (l) {${l}_{n}$};
+  \node[latent, above=0.5 * \ltkiz of y] (w) {${w}_{ng}$};
+  \node[latent, above=0.5 * \ltkiz of w, xshift=0] (z) {${z}_{n}$};
+  \node[obs, above= 0.5 *\ltkiz of w, xshift=2 * \ltkiz] (s) {${s}_{n}$};
+
+   \plate[inner sep=0.40cm, xshift=0.2cm, yshift=0.cm] {plate1} {(w) (h) (y) (x)} {G} {\color{blue}{Genes}}; %
+   \plate[inner sep=0.40cm, xshift=0.3cm, yshift=0.cm] {plate2} {(z) (l) (w) (h) (y) (x) (s) (plate1)} {N} {\color{blue}{Cells}}; %
+    \edge {s} {h};
+    \edge {s} {w};
+    \edge {z} {w, h} ; %
+    \edge {l} {y};
+    \edge {h} {x} ; %
+    \edge {w} {y}; %
+    \edge {y} {x} ; %
+\end{tikzpicture}
+\caption{The underlying graphical model of scVI. Shaded vertices represent observed random variables. Semi-shaded vertices represent variables that can be either observed or random. Empty vertices represent latent random variables. 
+%Shaded diamonds represent constants, set a priori. Empty diamonds represent global variables shared across all genes and cells. 
+Edges signify conditional dependency. Rectangles (``plates'') represent independent replication.}
+\end{figure}

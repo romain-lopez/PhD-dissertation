@@ -1,0 +1,20 @@
+\begin{table}
+\centering
+\begin{small}
+\begin{tabular}{lcccc}
+    \toprule
+\textbf{Method}   & \textbf{PBMC8KCITE} & \textbf{MarrowTM} & \textbf{Pancreas} & \textbf{DentateGyrus} \\[0.2 cm]
+\midrule
+\textbf{scVI}     & 0.73395    & 0.74325  & 0.81425 & 0.5418       \\[0.2 cm]
+% \textbf{scVI\_nb} & 0.7648     & 0.71035  & \textbf{0.8281}   & \textbf{0.5915}\\ [0.2 cm]
+\textbf{scANVI1}  & 0.74465    & 0.7418   & 0.76625  & 0.55875      \\[0.2 cm]
+\textbf{scANVI2}  & \textbf{0.8184}    & \textbf{0.77825}  & 0.78815  & 0.54135      \\[0.2 cm]
+\textbf{Seurat}   & 0.7351     & 0.72095  & 0.6174   & 0.4149       \\[0.2 cm]
+\textbf{MNN}     & 0.7364     & 0.6783   & 0.76205  & 0.4296       \\[0.2 cm]
+\textbf{PCA}      & 0.59895    & 0.6089   & 0.5474   & 0.4179 \\
+\bottomrule     
+\end{tabular}
+\end{small}
+\caption[Additional metric for retainment of structure via k-means clusters preservation.]{Additional metric for retainment of structure via $k$-means clusters preservation. For scANVI we perform semi-supervision using the cell type label (not $k$-means cluster labels) from only one of the two datasets. Thus we train two separate models SCANVI1 and SCANVI2. To obtain a measure of clustering conservation, we first run $k$-means clustering in the latent space of dataset 1, then in the harmonized latent space using only cells from dataset 1. We compute the adjusted Rand Index of the two clustering results. We then do the same for dataset 2 and the final score is the average for both datasets.} 
+\label{scanviclustering_retainment}
+\end{table}

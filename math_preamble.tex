@@ -1,0 +1,57 @@
+% SCVI
+
+\usetikzlibrary{bayesnet}
+\hyphenation{hem-a-to-po-ie-tic}
+
+
+\DeclarePairedDelimiterX{\infdivx}[2]{(}{)}{%
+  #1\;\delimsize|\delimsize|\;#2%
+}
+\newcommand{\kld}[2]{\ensuremath{D_{KL}\infdivx{#1}{#2}}}
+
+% scANVI
+\newcommand{\grad}{\nabla}
+\newcommand{\EE}{\mathbb{E}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand{\bb}[1]{\mathbf{#1}}
+\newcommand{\bh}{\bb{h}}
+\newcommand{\bx}{\bb{x}}
+\newcommand{\bz}{\bb{z}}
+\newcommand{\bbf}{\bb{f}}
+
+\newcommand\givenbase[1][]{\:#1\lvert\:}
+\let\given\givenbase
+\newcommand\ELBO{\text{ELBO}}
+\newcommand\E[2]{\mathbb{E}_{#1}\left[ #2 \right]}
+\newcommand\Elog[2]{\mathbb{E}_{#1}\left[ \log #2 \right]}
+\newcommand{\qall}{ q (z, u, c, l \given x) }
+\newcommand\KL[3]{\mathbb{KL}_{#1}\left( #2\lvert \lvert #3 \right)}
+\newcommand\KLG[2]{\KL{\text{G}}{#1}{#2}}
+\newcommand\KLM[2]{\KL{\text{M}}{#1}{#2}}
+
+\newcommand\zzn[1]{z^{\mathbf{#1}}_n}
+\newcommand\zz[1]{z^{\mathbf{#1}}}
+
+
+%%% decisions
+\DeclareRobustCommand{\rchi}{{\mathpalette\irchi\relax}}
+\newcommand{\irchi}[2]{\raisebox{\depth}{$#1\chi$}} % inner command, used by \rchi
+
+
+\DeclarePairedDelimiterX{\inftvx}[2]{(}{)}{%
+  #1, #2%
+}
+\newcommand{\kl}{\Delta_\textrm{KL}\infdivx}
+\newcommand{\tv}{\Delta_\textrm{TV}\inftvx}
+\newcommand{\tvsq}{\Delta^2_\textrm{TV}\inftvx}
+\newcommand{\chidiv}{\Delta_{\chi^2}\infdivx}
+\newcommand{\adiv}{\Delta_\alpha\infdivx}
+\newcommand{\dinf}{\Delta_{\infty}\infdivx}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\DeclareMathOperator{\Tr}{Tr}
+\newtheorem{prop}{Proposition}
+\newtheorem{definition}{Definition}
+\newtheorem{thm}{Theorem}
+\newtheorem{lemma}{Lemma}

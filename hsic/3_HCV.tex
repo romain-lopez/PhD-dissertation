@@ -1,0 +1,48 @@
+\section{Theory for HSIC-Constrained VAE (HCV)} 
+\label{hsichcv}
+This chapter is concerned with intepretability of representations learned via VAEs. Independence between certain components of the representation can aid in interpretability~\cite{betatcVAE, doi:10.1162/neco.1992.4.6.863}. First, we explain why AEVB might not be suitable for learning representations that satisfy independence statements. Second, we present a simple diagnostic in the case where the generative model is fixed. Third, we introduce HSIC-constrained VAEs (HCV): our method to correct approximate posteriors learned via AEVB in order to recover \emph{independent} representations.
+
+\subsection{Independence and representations: Ideal setting}
+
+The goal of learning representation that satisfies certain independence statements can be achieved by adding suitable nodes and edges to the generative distribution graphical model. In particular, marginal independence can be the consequence of an ``explaining away'' pattern as in Figure~\ref{hsicpgm}a for the triplet $\{u, x, v\}$. If we consider the setting of infinite data and an accurate posterior, we find that independence statements in the generative model are respected in the latent representation:
+
+\begin{thm}
+\label{hsicvgap}
+Let us apply AEVB to a model $p_\theta(X , Z\mid S)$ with independence statement $\mathcal{I}$ (e.g., $z^i \upmodels z^j$ for some $(i, j)$). If the variational gap $\mathbb{E}_{p_\text{data}(X, S)}\kld{q_\phi(Z \mid X, S)}{p_\theta(Z \mid X, S)}$ is zero, then under infinite data the representation $\hat{q}_\phi(Z)$ satisfies statement $\mathcal{I}$.
+\end{thm}
+\begin{proof}
+  Without loss of generality, we can write $\mathcal{I}$ as independence between two variables $Z_i \upmodels Z_j$ for some $(i, j)$. Under infinite data, the empirical distribution $p_\text{data}(X, S)$ is close to $p(X, S)$, the real distribution:
+  \begin{align}
+  \begin{split}
+  \hat{q}_\phi(Z_i, Z_j) & = \int q_\phi(Z_i, Z_j \mid X, S)p_\text{data}(X, S) \\
+  &= \int p_\theta(Z_i, Z_j \mid X, S)p_\text{data}(X, S) \\
+  &= \int p_\theta(Z_i, Z_j \mid X, S)p(X, S) \\
+  &=  p(Z_i, Z_j) \\
+  &= p(Z_i)(Z_j).
+  \end{split}
+  \end{align}
+  \end{proof}
+
+
+In practice we may be far from the idealized infinite setting if $(X, S)$ are high-dimensional. Also, AEVB is commonly used with a naive mean field approximation $q_\phi(Z \mid X, S) = \prod_k q_\phi(z^k \mid X, S)$, which could poorly match the real posterior. In the case of a VAE, neural networks are also used to parametrize the conditional distributions of the generative model. This makes it challenging to know whether naive mean field or any specific improvement~\cite{Kingma2016, BurdaGS15} is appropriate. As a consequence, the aggregated posterior could be quite different from the ``exact'' aggregated posterior $\mathbb{E}_{p_\text{data}(X, S)}p_\theta(Z \mid X, S)$. Notably, the independence properties encoded by the generative model $p_\theta(X \mid S)$ will often not be respected by the approximate posterior. This is observed empirically in~\cite{VFAE}, as well as Section~\ref{hsicindep} and Section~\ref{hsicinvariant} of this work.
+
+\subsection{A simple diagnostic in the case of posterior approximation}
+
+A theoretical analysis explaining why the empirical aggregated posterior presents some misspecified correlation is not straightforward. The main reason is that the learning of the model parameters $\theta$ along with the variational parameters $\phi$ makes diagnosis hard. As a first line of attack, let us consider the case where we approximate the posterior of a fixed model. Consider learning a posterior $q_\phi(Z \mid X, S)$ via naive mean field AEVB. Recent work~\cite{Chen2018,Hoffman2016, Makhzani2015} focuses on decomposing the second term of the ELBO and identifying terms, one of which is the total correlation between hidden variables in the aggregate posterior. This term, in principle, promotes independence. However, the decomposition has numerous interacting terms, which makes exact interpretation difficult. As the generative model is fixed in this setting, optimizing the ELBO is tantamount to minimizing the variational gap, which we propose to decompose as
+\begin{equation}
+\begin{split}
+\kld{q_\phi(Z \mid X, S)}{p_\theta(Z\mid X, S)} =  \sum_k &\kld{q_\phi(z^k\mid X, S)}{p_\theta(z^k\mid X, S)} \\
+  &+ \mathbb{E}_{q_\phi(Z\mid X, S)}\log\frac{\prod_k p_\theta(z^k\mid X, S) }{p_\theta(Z\mid X, S)}.
+\end{split}
+\end{equation}
+
+The last term of this equation quantifies the misspecification of the mean-field assumption. The larger it is, the more the coupling between the hidden variables $Z$. Since neural networks are flexible, they can be very successful at optimizing this variational gap but at the price of introducing supplemental correlation between $Z$ in the aggregated posterior. We expect this side effect whenever we use neural networks to learn a misspecified variational approximation. 
+
+\subsection{Correcting the variational posterior}
+We aim to correct the variational posterior $q_\phi(Z \mid X, S)$ so that it satisfies specific independence statements of the form $\forall (i, j) \in \mathcal{S}, \hat{q}_\phi(z^i) \upmodels \hat{q}_\phi(z^j)$. As $\hat{q}_\phi(Z)$ is a mixture distribution, any standard measure of independence is intractable based on the conditionals $q_\phi(Z \mid X, S)$, even in the common case of mixture of Gaussian distributions~\cite{Durrieu2012}. To address this issue, we propose a novel idea: estimate and minimize the dependency via a non-parametric statistical penalty. Given the AEVB framework, let $\lambda \in \mathbb{R}^+$, $\mathcal{Z}_0 = \{z^{i_1}, .., z^{i_p}\} \subset Z$ and $\mathcal{S}_0 = \{s^{j_1}, .., s^{j_q}\} \subset S$. The HCV framework with independence constraints on $\mathcal{Z}_0\cup\mathcal{S}_0 $ learns the parameters $\theta, \phi$ from maximizing the ELBO from AEVB penalized by
+\begin{equation} \label{hsicdhsic_penal}
+-\lambda d\textrm{HSIC}(\hat{q}_\phi(z^{i_1}, .., z^{i_p})p_\text{data}(s^{j_1}, .., s^{j_q})).
+\end{equation}
+A few comments are in order regarding this penalty. First, the $d$HSIC is positive and therefore our objective function is still a lower bound on the log-likelihood. The bound will be looser but the resulting parameters will yield a more suitable representation. This trade-off is adjustable via the parameter~$\lambda$. Second, the $d$HSIC can be estimated with the same samples used for stochastic variational inference (i.e., sampling from the variational distribution) and for minibatch sampling (i.e., subsampling the dataset). Third, the HSIC penalty is based only on the variational parameters---not the parameters of the generative model.
+
+\section{Results}

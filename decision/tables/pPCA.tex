@@ -1,0 +1,25 @@
+\begin{small}
+\begin{tabular}{lcccc}
+\toprule
+%  & \textbf{VAE} & \textbf{IWAE}& \textbf{WW} & \textbf{$\chi$-VAE} \\ \midrule
+%  $\log p_\theta(X)$ & -17.37 & \textbf{-16.91} & -16.91 & -17.30\\
+% IWELBO &  -17.37 & \textbf{-16.91} & -16.91 & -17.30\\
+% \midrule
+% PSIS & 0.57 & 0.25 & 0.53 & \textbf{0.04}\\
+% $\norm{A}_2$ & 1.99 & \textbf{0.93} & 1.43 & 0.98 \\
+% \midrule
+% MAE & 7.71 & \textbf{2.41} & 2.70 & 7.14\\
+& \textbf{VAE} & \textbf{IWAE} & \textbf{WW} & \textbf{$\rchi$-VAE}\\
+\midrule
+$\log p_\theta(X)$  & -17.65 & \textbf{-16.91} & -16.93 & -16.92\\
+IWELBO  & -17.66 & \textbf{-16.92} & -16.96 & \textbf{-16.92}\\
+\midrule
+$\norm{A}_2$  & 1.69 & 1.30 & 2.32 & \textbf{1.13}\\
+PSIS  & 0.54 & 0.53 & 0.66 & \textbf{0.47}\\
+\midrule
+% MAE  & 0.099 & \textbf{0.026} & 0.039 & 0.028\\
+MAE  & 0.103 & 0.032 & 0.043 & \textbf{0.030}\\
+\bottomrule
+\end{tabular}
+\end{small}
+\caption[Results on the pPCA simulated data]{\label{table:mixture}Results on the pPCA simulated data. MAE refers to the mean absolute error in posterior expectation estimation.}

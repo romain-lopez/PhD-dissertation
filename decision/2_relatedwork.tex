@@ -1,0 +1,155 @@
+\section{Background}
+\label{sec:related}
+Bayesian decision making~\cite{Fienberg} makes use of a model and its posterior distribution to make optimal decisions. We bring together several lines of research in an overall Bayesian framework.
+
+% \jeff{What happened to the section on evidence upper bounds? Not enough space? It seemed like a useful section but I suppose we can do without it.}
+% no indeed, I added some info in Appendix B about CUBO
+
+\subsection{Auto-encoding variational Bayes}
+\label{aevb}
+Variational autoencoders~\cite{AEVB} are based on a hierarchical Bayesian model~\cite{GelmanHill:2007}. Let $x$ be the observed random variables and $z$ the latent variables. To learn a generative model $p_\theta(x, z)$ that maximizes the evidence $\log p_\theta(x)$, variational Bayes~\cite{wainwright2008graphical} uses a proposal distribution $q_\phi(z \mid x)$ to approximate the posterior $p_\theta(z \mid x)$. The evidence decomposes as the \emph{evidence lower bound} (ELBO) and the reverse KL variational gap (VG):
+\begin{align}
+    % \underbrace{\log p_\theta(x)}_{\text{evidence}} &= \underbrace{\mathbb{E}_{q_\phi(z \mid x)}\log \frac{p_\theta(x, z)}{q_\phi(z \mid x)}}_{\text{ELBO}}
+    % + \underbrace{\kl{q_\phi}{p_\theta}}_{\text{reverse KL VG}}. \label{ELBO}
+    \log p_\theta(x) &= \mathbb{E}_{q_\phi(z \mid x)}\log \frac{p_\theta(x, z)}{q_\phi(z \mid x)} + \kl{q_\phi}{p_\theta}. \label{ELBO}
+\end{align}
+Here we adopted the condensed notation $\kl{q_\phi}{p_\theta}$ to refer to the KL divergence between $q_\phi(z\mid x)$ and $p_\theta(z \mid x)$.
+In light of this decomposition, a valid inference procedure involves jointly maximizing the ELBO with respect to the model's parameters and the variational distribution. The resulting variational distribution minimizes the reverse KL divergence. VAEs parameterize the variational distribution with a neural network. Stochastic gradients of the ELBO with respect to the variational parameters are computed via the reparameterization trick~\cite{AEVB}. 
+
+
+% \subsection{Evidence upper bounds for approximate inference}
+% \label{upper}
+% Although variational inference traditionally maximizes a lower bound on the marginal likelihood, upper bounds on the marginal likelihood can be minimized instead.
+% \cite{EUBO} decompose the evidence into the \emph{evidence upper bound} (EUBO) and the forward KL VG:
+% \begin{align}
+%     \underbrace{\log p_\theta(x)}_{\text{evidence}} &= \underbrace{\log\mathbb{E}_{p_\theta(z \mid x)}\frac{p_\theta(x, z)}{q_\phi(z \mid x)}}_{\text{EUBO}} - \underbrace{\kl{p_\theta}{q_\phi}}_{\text{forward KL VG}}. \label{EUBO}
+% \end{align}
+% \cite{NIPS2017_6866} decompose the evidence using a $\chi^2$ divergence:
+% \begin{align}
+% \begin{split}
+%     \underbrace{\log p_\theta(x)}_{\text{evidence}} &= \underbrace{\frac{1}{2}\log\mathbb{E}_{q_\phi(z \mid x)}\left(\frac{p_\theta(x, z)}{q_\phi(z \mid x)}\right)^2}_{\text{CUBO}} - \underbrace{\frac{1}{2}\log\left(1 + \chidiv{p_\theta}{q_\phi}\right)}_{\text{$\chi^2$ VG}}. \label{CUBO}
+% \end{split}
+% \end{align}
+% The choice of ELBO, EUBO, and CUBO matters msot when the posterior does not belong to the variational family, as is typically the case. The properties of the variational distribution (mode-seeking or mass-covering) depends highly on the geometry of the variational gap~\cite{futami2018variational}.
+
+\subsection{Approximating of posterior expectations}
+\label{ss:posterior_approx}
+Given a model $p_\theta$, an action set $\mathcal{A}$, and a loss $L$, the optimal decision $a^*(x)$ for observation $x$ is an expectation taken with respect to the posterior:
+\(
+    \mathcal{Q}(f, x) = \mathbb{E}_{p_\theta(z \mid x)}f(z).
+\)
+Here $f$ depends on the loss~\cite{Fienberg}. We therefore focus on numerical methods for estimating $\mathcal{Q}(f, x)$. Evaluating these expectations is the aim of Markov chain Monte Carlo, annealed importance sampling (AIS)~\cite{neal2001annealed}, and variational methods~\cite{NIPS2018_7699}. 
+
+Although we typically do not have direct access to the posterior $p_\theta(z \mid x)$, we can, however, sample $(z_i)_{1 \leq i \leq n}$ from the variational distribution $q_\phi(z \mid x)$.  A naive, but practical, approach is to consider a plugin estimator~\cite{Amini2018, Riesselman2018, Ding2018, Lopez292037}:
+\begin{align}
+\hat{\mathcal{Q}}^n_{\textrm{P}}(f, x) = \frac{1}{n}\sum_{i=1}^nf(z_i),
+\end{align}
+which replaces the exact posterior by sampling $z_1,\ldots,z_n$ from $q_\phi(z \mid x)$.  A less naive approach is to use
+self-normalized importance sampling (SNIS),
+\begin{align}
+\hat{\mathcal{Q}}^n_{\textrm{IS}}(f, x) = 
+    \frac{\sum_{i=1}^nw(x, z_i)f(z_i)}{\sum_{j=1}^nw(x, z_j)},
+\end{align}
+with importance weights
+\(
+    w(x, z) := \nicefrac{p_\theta(x, z)}{q_\phi(z\mid x)}. 
+\)
+The nonasymptotic behavior of both estimators as well as their variants is well understood~\cite{Chatterjee2018,Agapiou2017,Cortes2010}. Moreover, each upper bound on the error motivates an alternative inference procedure in which the upper bound is used as a surrogate for the error. For example, \cite{Chatterjee2018} bounds on the error of the IS estimator as a function of \textit{forward} KL divergence $\kl{p_\theta}{q_\phi}$, which motivates the WW algorithm in~\cite{le2018revisiting}. Similarly,~\cite{Agapiou2017} provides an upper bound of the error based on the $\rchi^2$ divergence, which in turn justifies our investigation of the $\rchi$-VAE. However, these upper bounds are too broad to explicitly compare, for example, the worst-case performance of $\rchi$-VAE and WW when $f$ belongs to a function class (further details in Appendix~\ref{app:err_simple_bounds}). 
+
+
+\section{Chi-square VAEs}
+\label{app:chi-vaes}
+We propose a novel variant of the WW algorithm based on $\chi^2$ divergence minimization, and thus potentially particularly suited for decision-making. This variant is incremental in the sense that it combines several existing contributions such as the CHIVI procedure~\cite{NIPS2017_6866}, the WW algorithm~\cite{le2018revisiting} as well as using a reparameterized Student's t distributed variational posterior (e.g., explored in~\cite{NIPS2018_7699} for IWVI). However, we did not encounter any other mention of such a variant in previous literature. 
+
+In the $\rchi$-VAE, we update the model and the variational parameters as a first-order stochastic block coordinate descent (as in WW~\cite{le2018revisiting}). For a fixed inference model $q_\phi$, we take gradients of the IWELBO with respect to the model parameters. For a fixed generative model $p_\theta$, we seek to minimize the $\rchi^2$ divergence between the posterior and the inference model. This quantity is intractable but we can formulate an equivalent optimization problem using the $\rchi$ upper bound (CUBO)~\cite{NIPS2017_6866}:
+\begin{align}
+\begin{split}
+    \underbrace{\log p_\theta(x)}_{\text{evidence}} &= \underbrace{\frac{1}{2}\log\mathbb{E}_{q_\phi(z \mid x)}\left(\frac{p_\theta(x, z)}{q_\phi(z \mid x)}\right)^2}_{\text{CUBO}} - \underbrace{\frac{1}{2}\log\left(1 + \chidiv{p_\theta}{q_\phi}\right)}_{\text{$\chi^2$ VG}}. \label{CUBO}
+\end{split}
+\end{align}
+It is known that the properties of the variational distribution (mode-seeking or mass-covering) depends highly on the geometry of the variational gap~\cite{futami2018variational}, which was our initial motivation for using the $\rchi$-VAE for decision-making. For a fixed model, minimizing the exponentiated CUBO is a valid approach for minimizing the $\rchi^2$ divergence. 
+
+Finally, in many cases the $\rchi^2$ divergence may be infinite. This is true even for two Gaussian distributions provided that the variance of $q_\phi$ does not cover the posterior enough. We found in our pPCA experiments that using a Gaussian distributed posterior may still provide helpful proposals. However, we expect a Student's t distributed variational posterior to properly alleviate this concern. \cite{NIPS2018_7699} proposed a reparameterization trick for elliptical distributions, including the Student's t distribution based on the CDF of the $\rchi$ distribution. In our experiments, we reparameterized samples from a Student's t distribution with location $\mu$, scale $\Sigma = A^\top A$ and degrees of freedom $\nu$ as follows:
+\begin{align}
+    \delta &\sim \textrm{Normal}(0, I) \\
+    % \delta &\sim \textrm{Spherical}(0, I) \\
+    \epsilon &\sim \chi^2_\nu\\
+    % \eta & \sim \chi^2_d \\
+    % t & \sim 
+    % \sqrt{
+    %     \nu
+    %     \frac
+    %     {\eta}
+    %     {\epsilon}
+    % }
+    % A^\top
+    % \delta + \mu,
+    t &\sim \sqrt{\frac{\nu}{\epsilon}}A^\top \delta + \mu,
+\end{align} 
+where we used reparameterized samples for the $\rchi^2_\nu$ distribution following~\cite{figurnov2018implicit}.
+% and where $\textrm{Spherical}(0, I)$ denotes the uniform distribution on the unit $(d-1)$-sphere.
+
+
+
+\section{Limitations of standard results for posterior statistics estimators}
+\label{app:err_simple_bounds}
+
+Neither~\cite{Chatterjee2018} nor~\cite{Agapiou2017} pretended that upper bounds on the error of the IS estimator may help comparing algorithmic procedures. Similarly, ~\cite{le2018revisiting} used the result from~\cite{Chatterjee2018} as a motivation but did not use it to claim better performance than another method. Still, we outline two simple reasons in this section for why upper bounds on the error of IS are not helpful for comparing algorithms. 
+
+We start by stating simple results of upper bounding the mean square error of the SNIS estimator. 
+\begin{restatable}{prop}{propbounds}\label{prop:simple_bounds}\emph{(Deviation for posterior expectation estimates)} Let $f$ be a bounded test function. For the plugin estimator, we have
+\begin{align}
+\label{eq:up_plugin}
+    \sup_{\norm{f}_\infty \leq 1}\mathbb{E}\left[ \left( \hat{\mathcal{Q}}^n_{\textrm{P}}(f, x) -  \mathcal{Q}(f, x) \right)^2 \right]     \leq & 4\tvsq{p_\theta}{q_\phi} + \frac{1}{2n},
+\end{align}
+where $\Delta_\textrm{TV}$ denotes the total variation distance. For the SNIS estimator, if we further assume that $w(x, z)$ has finite second order moment under $q_\phi(z \mid x)$, then we have
+\begin{align}
+\label{eq:up_snis}
+    \sup_{\norm{f}_\infty \leq 1}\mathbb{E}\left[ \left( \hat{\mathcal{Q}}^n_{\textrm{IS}}(f, x) -  \mathcal{Q}(f, x) \right)^2 \right] \leq & \frac{4\chidiv{p_\theta}{q_\phi}}{n},
+\end{align}
+where $\Delta_{\chi^2}$ denotes the chi-square divergence.
+\end{restatable}
+We derive the first bound is derived in a later section while the second one is from~\cite{Agapiou2017}. We now derive two points to argue that such bounds are uninformative for selecting the best algorithm. 
+
+First, these bounds suggest the plugin estimator is suboptimal because its bias does not vanish with infinite samples, in contrast to the SNIS estimator. 
+However, the upper bound in~\cite{Agapiou2017} may be uninformative when the $\chi^2$ divergence is infinite (as it may be for a VAE). Consequently, it is not immediately apparent which estimator will perform better. 
+
+A second issue we wish to underline pertains to the general fact that upper bounds may be loose. For example, with Pinsker's inequality we may further upper bound the bias of the plugin estimator by the square root of either $\kl{p_\theta}{q_\phi}$ or $\kl{q_\phi}{p_\theta}$. In which case, the VAE and the WW algorithm~\cite{le2018revisiting} both minimize an upper bound on the mean-square error of the plugin estimator; which one to choose is again not clear.
+
+
+\paragraph{Proof of Proposition 1}
+\begin{proof}
+For the plugin estimator
+\begin{align}
+\hat{\mathcal{Q}}^n_{\textrm{P}}(f, x) = \frac{1}{n}\sum_{i=1}^nf(z_i),
+\end{align}
+we can directly calculate and upper bound the mean-square error. First, we will use for notational convenience:
+\begin{align}
+    I^* &= \mathbb{E}_{p(z \mid x)} f(z) \\
+    \bar{I} &= \mathbb{E}_{q(z \mid x)} f(z)
+\end{align}
+and notice that:
+\begin{align}
+    \left|I^* - \bar{I}\right| \leq & \sup_{\norm{g}_\infty \leq 1}\left|\mathbb{E}_{q(z \mid x)} g(z) - \mathbb{E}_{p(z \mid x)} g(z) \right| \\
+    &\leq 2\tv{p(z \mid x)}{q(z \mid x)},
+\end{align}
+by definition of the total variation distance. Now we can proceed to the calculations:
+\begin{align}
+    \left( \frac{1}{n}\sum_{i=1}^nf(z_i) - I^*  \right)^2  & = \left( \frac{1}{n}\sum_{i=1}^nf(z_i) - \bar{I}\right)^2 + (I^* - \bar{I})^2 + 2\left( \frac{1}{n}\sum_{i=1}^nf(z_i) - \bar{I}\right)(I^* - \bar{I}),
+\end{align}
+and take expectations on both sides with respect to the variational distribution:
+\begin{align}
+\mathbb{E}\left( \frac{1}{n}\sum_{i=1}^nf(z_i) - I^*  \right)^2  & = \mathbb{E}\left( \frac{1}{n}\sum_{i=1}^nf(z_i) - \bar{I}\right)^2 + (I^* - \bar{I})^2 \\
+& = \frac{1}{n}\mathbb{E}\left(f(z_1) - \bar{I}\right)^2 + (I^* - \bar{I})^2 \\
+& \leq \frac{1}{2n} + 4\tvsq{p(z \mid x)}{q(z \mid x)}
+\end{align}
+
+For the self-normalized importance sampling estimator
+\begin{align}
+\hat{\mathcal{Q}}^n_{\textrm{IS}}(f, x) = 
+    \frac{1}{n}\sum_{i=1}^nw(x, z_i)f(z_i),
+\end{align}
+we instead rely on Theorem 2.1 of~\cite{Agapiou2017}.
+\end{proof}
+
+

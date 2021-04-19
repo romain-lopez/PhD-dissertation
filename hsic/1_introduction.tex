@@ -1,0 +1,36 @@
+\section{Introduction}
+
+Since the introduction of variational auto-encoders (VAEs)~\cite{AEVB},
+graphical models whose conditional distribution are specified by deep neural networks have become commonplace.
+For problems where all that matters is the goodness-of-fit (e.g., marginal log probability of the data), there is little reason to constrain the flexibility/expressiveness of these networks other than possible considerations of overfitting. In other problems, however, some latent representations may be preferable to others---for example, for reasons of interpretability or modularity.
+Traditionally, such constraints on latent representations have been expressed in the graphical model setting via conditional independence assumptions.  But these assumptions are relatively rigid, and with the advent of highly flexible conditional distributions, it has become important to find ways to constrain latent representations that go beyond the rigid conditional independence structures of classical graphical models.
+
+%\todo[inline]{Add some motivation sentences}
+
+
+In this chapter, we propose a new method for restricting the search space to latent representations
+with desired independence properties.
+As in~\cite{AEVB}, we approximate the posterior for each observation $X$ with an encoder network that parameterizes $q_\phi(Z \mid X)$.
+Restricting this search space amounts to constraining the class of variational distributions that we consider.
+In particular, we aim to constrain the \textit{aggregated variational posterior}~\cite{salakhutdinov2010efficient}:
+\begin{align}
+\hat{q}_\phi(Z) := \mathbb E_{p_{\text{data}}(X)} \left[ q_\phi(Z \mid X) \right].
+\end{align}
+Here $p_{\text{data}}(X)$ denotes the empirical distribution. 
+We aim to enforce independence statements of the form $\hat{q}_\phi(Z^i) \upmodels \hat{q}_\phi(Z^j)$,
+where $i$ and $j$ are different coordinates of our latent representation.
+
+Unfortunately, because $\hat{q}_\phi(Z)$ is a mixture distribution, computing any standard measure of independence is intractable, even in the case of Gaussian terms~\cite{Durrieu2012}.
+In this chapter, we circumvent this problem in a novel way. First, we estimate dependency though a kernel-based measure of independence, in particular the Hilbert-Schmidt Information Criterion (HSIC)~\cite{Gretton2005}. Second,
+by scaling and then subtracting this measure of dependence in the variational lower bound, we get a new variational lower bound on $\log p(X)$.
+Maximizing it amounts to maximizing the traditional variational lower bound with a penalty for deviating from the desired independence conditions.
+We refer to this approach as \emph{HSIC-constrained VAE} (HCV).
+
+The remainder of the chapter is organized as follows.
+In Section~\ref{hsicbackground}, we provide background on VAEs and the HSIC.
+In Section~\ref{hsichcv}, we precisely define HCV and provide a theoretical analysis.
+The next three sections each present an application of HVC---one for each task shown in Figure~\ref{hsicpgm}.
+In Section~\ref{hsicindep}, we consider the problem of learning an interpretable latent representation, and we show that HCV compares favorably to $\beta$-VAE~\cite{Higgins2017} and $\beta$-TCVAE~\cite{betatcVAE}.
+In Section~\ref{hsicinvariant}, we consider the problem of learning an invariant representation, showing both that HCV includes the variational fair auto-encoder (VFAE)~\cite{VFAE} as a special case, and that it can improve on the VFAE with respect to its own metrics.
+In Section~\ref{hsicdenoise}, we denoise single-cell RNA sequencing data with HCV, and show that our method recovers biological signal better than the current state-of-the-art approach. A open-source implementation of our framework is available on GitHub \url{https://github.com/romain-lopez/HCV}.
+\input{hsic/figures/pgm}
